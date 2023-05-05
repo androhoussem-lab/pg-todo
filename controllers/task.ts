@@ -1,12 +1,23 @@
 import Task from "@/models/task";
 import { NextResponse } from "next/server";
 
-export const index = async () => {
+export const index = async (req: Request) => {
   try {
-    const tasks = await Task.findAll({
-      order: [["id", "ASC"]], //DESC
-    });
-    return NextResponse.json({ status: 200, data: tasks });
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (id) {
+      const task = await Task.findAll({
+        where: {
+          id: id,
+        },
+      });
+      return NextResponse.json({ status: 200, data: task });
+    } else {
+      const tasks = await Task.findAll({
+        order: [["id", "ASC"]], //DESC
+      });
+      return NextResponse.json({ status: 200, data: tasks });
+    }
   } catch (error) {
     return NextResponse.json({ status: 400, error: error });
   }
